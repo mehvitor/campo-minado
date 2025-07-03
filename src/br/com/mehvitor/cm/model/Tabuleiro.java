@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import br.com.mehvitor.cm.excecao.ExplosaoException;
+
 public class Tabuleiro {
 
 	private int linhas;
@@ -23,10 +25,15 @@ public class Tabuleiro {
 	}
 	
 	public void abrirCampo(int linha, int coluna) {
-		campos.parallelStream()
-		.filter(c -> c.getLinha() == linha && c.getColuna() == coluna)
-		.findFirst()
-		.ifPresent(c -> c.abrirCampo());;
+		try {
+			campos.parallelStream()
+			.filter(c -> c.getLinha() == linha && c.getColuna() == coluna)
+			.findFirst()
+			.ifPresent(c -> c.abrirCampo());;
+		} catch (ExplosaoException e) {
+			campos.forEach(c -> c.setCampoAberto(true));
+			throw e;
+		}
 	}
 
 	public void alterMarcacao(int linha, int coluna) {
@@ -59,12 +66,11 @@ public class Tabuleiro {
 		Predicate<Campo> minado = c -> c.isMinado();
 		
 		do {
+			int aleatorio = (int) (Math.random() * campos.size());
+			campos.get(aleatorio).minar();
 			minasArmadas = campos.stream()
 					.filter(minado)
 					.count();
-			
-			int aleatorio = (int) (Math.random() * campos.size());
-			campos.get(aleatorio).minar();
 			
 		} while (minasArmadas < minas);
 		

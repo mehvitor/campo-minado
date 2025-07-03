@@ -81,6 +81,14 @@ public class Campo {
 		return minado;
 	}
 	
+	public boolean isCampoAberto() {
+		return campoAberto;
+	}
+
+	void setCampoAberto(boolean campoAberto) {
+		this.campoAberto = campoAberto;
+	}
+
 	public boolean isAberto() {
 		return campoAberto;
 	}
@@ -88,7 +96,7 @@ public class Campo {
 	public boolean isFechado() {
 		return !isAberto();
 	}
-
+	
 	public int getLinha() {
 		return linha;
 	}

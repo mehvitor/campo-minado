@@ -2,6 +2,7 @@ package br.com.mehvitor.cm.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Tabuleiro {
 
@@ -20,7 +21,20 @@ public class Tabuleiro {
 		associarVizinhos();
 		sortearMinas();
 	}
+	
+	public void abrirCampo(int linha, int coluna) {
+		campos.parallelStream()
+		.filter(c -> c.getLinha() == linha && c.getColuna() == coluna)
+		.findFirst()
+		.ifPresent(c -> c.abrirCampo());;
+	}
 
+	public void alterMarcacao(int linha, int coluna) {
+		campos.parallelStream()
+		.filter(c -> c.getLinha() == linha && c.getColuna() == coluna)
+		.findFirst()
+		.ifPresent(c -> c.alterMarcacao());;
+	}
 
 	private void gerarCampos() {
 		for (int i = 0; i < linhas; i++) {
@@ -41,9 +55,51 @@ public class Tabuleiro {
 	}
 	
 	private void sortearMinas() {
-		// TODO Auto-generated method stub
+		long minasArmadas = 0;
+		Predicate<Campo> minado = c -> c.isMinado();
+		
+		do {
+			minasArmadas = campos.stream()
+					.filter(minado)
+					.count();
+			
+			int aleatorio = (int) (Math.random() * campos.size());
+			campos.get(aleatorio).minar();
+			
+		} while (minasArmadas < minas);
 		
 	}
 
+	public boolean objetivoAlcancado() {
+		return campos.stream()
+				.allMatch(c -> c.objetivoAlcancado());
+	}
+	
+	public void reiniciarJogo() {
+		campos.stream()
+		.forEach(c -> c.reiniciarJogo());
+		sortearMinas();
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		int i = 0;
+		for (int l = 0; l < linhas; l++) {
+			for (int c = 0; c < colunas; c++) {
+				sb.append(" ");
+				sb.append(campos.get(i));
+				sb.append(" ");
+				i++;
+			}
+			sb.append("\n");
+		}
+		
+		
+		return sb.toString();
+	}
+	
 	
 }
